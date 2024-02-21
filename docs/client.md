@@ -1,4 +1,4 @@
-### G4F Client API Documentation (Beta Version)
+### G4F - Client API (Beta Version)
 
 #### Introduction
 
@@ -31,7 +31,7 @@ from g4f.client import Client
 from g4f.Provider import BingCreateImages, OpenaiChat, Gemini
 
 client = Client(
-    text_provider=OpenaiChat,
+    provider=OpenaiChat,
     image_provider=Gemini,
     proxies=None
 )
@@ -44,10 +44,22 @@ client = Client(
 You can use the `ChatCompletions` endpoint to generate text completions as follows:
 
 ```python
+response = client.chat.completions.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": "Say this is a test"}],
+    ...
+)
+print(response.choices[0].message.content)
+```
+
+Also streaming are supported:
+
+```python
 stream = client.chat.completions.create(
     model="gpt-4",
     messages=[{"role": "user", "content": "Say this is a test"}],
     stream=True,
+    ...
 )
 for chunk in stream:
     if chunk.choices[0].delta.content:
@@ -89,5 +101,4 @@ Original / Variant:
 [![Original Image](/docs/cat.jpeg)](/docs/client.md)
 [![Variant Image](/docs/cat.webp)](/docs/client.md)
 
-[Return to Documentation Home](/)
-```
+[Return to Home](/)
