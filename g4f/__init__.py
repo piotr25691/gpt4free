@@ -8,8 +8,9 @@ from .Provider import AsyncGeneratorProvider, ProviderUtils
 from .typing   import Messages, CreateResult, AsyncResult, Union
 from .cookies  import get_cookies, set_cookies
 from .         import debug, version
-from .base_provider import BaseRetryProvider, ProviderType
-from .Provider.base_provider import ProviderModelMixin
+from .providers.types import BaseRetryProvider, ProviderType
+from .providers.base_provider import ProviderModelMixin
+from .providers.retry_provider import IterProvider
 
 def get_model_and_provider(model    : Union[Model, str], 
                            provider : Union[ProviderType, str, None], 
@@ -41,11 +42,16 @@ def get_model_and_provider(model    : Union[Model, str],
     if debug.version_check:
         debug.version_check = False
         version.utils.check_version()
-       
+
     if isinstance(provider, str):
-        if provider in ProviderUtils.convert:
+        if " " in provider:
+            provider_list = [ProviderUtils.convert[p] for p in provider.split() if p in ProviderUtils.convert]
+            if not provider_list:
+                raise ProviderNotFoundError(f'Providers not found: {provider}')
+            provider = IterProvider(provider_list)
+        elif provider in ProviderUtils.convert:
             provider = ProviderUtils.convert[provider]
-        else:
+        elif provider:
             raise ProviderNotFoundError(f'Provider not found: {provider}')
 
     if isinstance(model, str):
@@ -63,11 +69,14 @@ def get_model_and_provider(model    : Union[Model, str],
     if isinstance(model, Model):
         model = model.name
 
-    if ignored and isinstance(provider, BaseRetryProvider):
-        provider.providers = [p for p in provider.providers if p.__name__ not in ignored]
-
     if not ignore_working and not provider.working:
         raise ProviderNotWorkingError(f'{provider.__name__} is not working')
+
+    if not ignore_working and isinstance(provider, BaseRetryProvider):
+        provider.providers = [p for p in provider.providers if p.working]
+
+    if ignored and isinstance(provider, BaseRetryProvider):
+        provider.providers = [p for p in provider.providers if p.__name__ not in ignored]
     
     if not ignore_stream and not provider.supports_stream and stream:
         raise StreamNotSupportedError(f'{provider.__name__} does not support "stream" argument')

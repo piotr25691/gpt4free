@@ -11,28 +11,31 @@ with codecs.open(os.path.join(here, 'README.md'), encoding='utf-8') as fh:
 INSTALL_REQUIRE = [
     "requests",
     "aiohttp",
+    "brotli"
 ]
 
 EXTRA_REQUIRE = {
     'all': [
-        "curl_cffi>=0.6.0b9",
+        "curl_cffi>=0.6.2",
         "certifi",
-        "async-property",          # openai
-        "py-arkose-generator",     # openai
+        #"py-arkose-generator",     # not working
         "browser_cookie3",         # get_cookies
         "PyExecJS",                # GptForLove
-        "duckduckgo-search",       # internet.search
+        "duckduckgo-search>=5.0"  ,# internet.search
         "beautifulsoup4",          # internet.search and bing.create_images
         "brotli",                  # openai
-        "platformdirs",            # webdriver
-        "undetected-chromedriver", # webdriver
-        "setuptools",              # webdriver
+        #"undetected-chromedriver>=3.5.5", # webdriver
+        #"setuptools",              # webdriver
+        "pywebview",
+        "platformdirs",
+        "plyer",
         "aiohttp_socks",           # proxy
         "pillow",                  # image
         "cairosvg",                # svg image
         "werkzeug", "flask",       # gui
         "loguru", "fastapi",
         "uvicorn", "nest_asyncio", # api
+        #"selenium-wire"
     ],
     "image": [
         "pillow",
@@ -42,7 +45,13 @@ EXTRA_REQUIRE = {
     "webdriver": [
         "platformdirs",
         "undetected-chromedriver",
-        "setuptools"
+        "setuptools",
+        "selenium-wire"
+    ],
+    "webview": [
+        "webview",
+        "platformdirs",
+        "plyer"
     ],
     "openai": [
         "async-property",
@@ -56,8 +65,11 @@ EXTRA_REQUIRE = {
     "gui": [
         "werkzeug", "flask",
         "beautifulsoup4", "pillow",
-        "duckduckgo-search",
+        "duckduckgo-search>=5.0",
         "browser_cookie3"
+    ],
+    "local": [
+        "gpt4all"
     ]
 }
 
@@ -76,7 +88,7 @@ setup(
     long_description=long_description,
     packages=find_packages(),
     package_data={
-        'g4f': ['g4f/interference/*', 'g4f/gui/client/*', 'g4f/gui/server/*', 'g4f/Provider/npm/*']
+        'g4f': ['g4f/interference/*', 'g4f/gui/client/*', 'g4f/gui/server/*', 'g4f/Provider/npm/*', 'g4f/local/models/*']
     },
     include_package_data=True,
     install_requires=INSTALL_REQUIRE,
